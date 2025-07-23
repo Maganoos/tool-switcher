@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "tool-switcher",
+	"version": "${version}",
+	"name": "Tool Switcher",
+	"description": "Automatically switches to the correct tool when breaking blocks.",
+	"authors": [
+		"Maganoos"
+	],
+	"contact": {
+		"sources": "https://github.com/Maganoos/tool-switcher"
+	},
+	"license": "MIT",
+	"icon": "assets/tool-switcher/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"eu.magkari.tool_switcher.ToolSwitcher"
+		]
+	},
+	"mixins": [
+		"tool-switcher.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.8",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
