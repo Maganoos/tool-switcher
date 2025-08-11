@@ -1,9 +1,9 @@
 {
 	"required": true,
-	"package": "eu.magkari.tool_switcher.mixin",
+	"package": "eu.magkari.mc.tool_switcher.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-      "MixinClientPlayerInteractionManager"
+      "eu.magkari.mc.tool_switcher.mixin.MixinClientPlayerInteractionManager"
 	],
 	"injectors": {
 		"defaultRequire": 1

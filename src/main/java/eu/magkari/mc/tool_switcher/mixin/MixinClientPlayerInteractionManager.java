@@ -1,4 +1,4 @@
-package eu.magkari.tool_switcher.mixin;
+package eu.magkari.mc.tool_switcher.mixin;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 
-import static eu.magkari.tool_switcher.ToolSwitcher.toggled;
+import static eu.magkari.mc.tool_switcher.ToolSwitcher.toggled;
 
 @Mixin(ClientPlayerInteractionManager.class)
 public class MixinClientPlayerInteractionManager {

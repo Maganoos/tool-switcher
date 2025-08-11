@@ -1,4 +1,4 @@
-package eu.magkari.tool_switcher;
+package eu.magkari.mc.tool_switcher;
 
 import net.fabricmc.api.ClientModInitializer;
 

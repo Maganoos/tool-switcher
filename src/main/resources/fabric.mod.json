@@ -15,7 +15,7 @@
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"eu.magkari.tool_switcher.ToolSwitcher"
+			"eu.magkari.mc.tool_switcher.ToolSwitcher"
 		]
 	},
 	"mixins": [
