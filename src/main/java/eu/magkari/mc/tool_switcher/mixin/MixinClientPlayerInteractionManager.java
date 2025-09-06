@@ -4,7 +4,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
@@ -34,39 +39,87 @@ public class MixinClientPlayerInteractionManager {
 
 	@Inject(method = "attackBlock", at = @At("HEAD"))
 	private void onAttackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-		if (toggled) {
-			MinecraftClient client = MinecraftClient.getInstance();
-			if (client.world == null) return;
-
-			BlockState state = client.world.getBlockState(pos);
-
-			TOOL_MAP.entrySet().stream()
-					.filter(entry -> state.isIn(entry.getKey()))
-					.map(Map.Entry::getValue)
-					.findFirst().ifPresent(toolTag -> switchTool(toolTag, state, client, pos));
+		if (!toggled) {
+			return;
 		}
+
+		final MinecraftClient client = MinecraftClient.getInstance();
+		if (client.world == null) {
+			return;
+		}
+
+		final BlockState blockState = client.world.getBlockState(pos);
+
+		TOOL_MAP.entrySet().stream()
+				.filter(entry -> blockState.isIn(entry.getKey()))
+				.map(Map.Entry::getValue)
+				.findFirst()
+				.ifPresent(toolTag -> switchTool(toolTag, blockState, client, pos));
 	}
 
+	/**
+	 * Selects the optimal tool in the hotbar based on block state and enchantments.
+	 *
+	 * @param toolTag Target tool type tag
+	 * @param state   Block state being mined
+	 * @param client  Minecraft client instance
+	 * @param pos     Block position
+	 */
 	@Unique
 	private void switchTool(TagKey<Item> toolTag, BlockState state, MinecraftClient client, BlockPos pos) {
-		if (client.player == null || Objects.requireNonNull(client.interactionManager).getCurrentGameMode() != GameMode.SURVIVAL)
+		if (client.player == null) {
+			throw new IllegalStateException("Cannot switch tools: MinecraftClient.player is null.");
+		}
+		if (client.getNetworkHandler() == null) {
+			throw new IllegalStateException("Cannot switch tools: MinecraftClient network handler is null.");
+		}
+		if (Objects.requireNonNull(client.interactionManager).getCurrentGameMode() != GameMode.SURVIVAL) {
 			return;
-		var inventory = client.player.getInventory();
+		}
 
+		final var inventory = client.player.getInventory();
+		final int currentSlot = inventory.getSelectedSlot();
+		final var currentStack = inventory.getStack(currentSlot);
+
+		float bestEfficiency = -1f;
 		int bestSlot = -1;
-		float bestEfficiency = -1;
 
-		int oldSlot = inventory.getSelectedSlot();
+		final RegistryEntry<Enchantment> efficiencyEnchantment = client.getNetworkHandler()
+				.getRegistryManager()
+				.getOrThrow(RegistryKeys.ENCHANTMENT)
+				.getOrThrow(Enchantments.EFFICIENCY);
+
+		if (currentStack.isIn(toolTag)) {
+			bestEfficiency = currentStack.getMiningSpeedMultiplier(state);
+			final int currentEfficiencyLevel = EnchantmentHelper.getLevel(efficiencyEnchantment, currentStack);
+
+			if (currentEfficiencyLevel > 0) {
+				bestEfficiency += currentEfficiencyLevel * bestEfficiency * 0.3f;
+			}
+			bestSlot = currentSlot;
+		}
+
 		for (int i = 0; i < 9; i++) {
-			var stack = inventory.getStack(i);
-			if (!stack.isIn(toolTag)) continue;
-			inventory.setSelectedSlot(i);
-			var efficiency = stack.getMiningSpeedMultiplier(state);
+			final var stack = inventory.getStack(i);
+			if (!stack.isIn(toolTag)) {
+				continue;
+			}
+
+			float efficiency = stack.getMiningSpeedMultiplier(state);
+			final int efficiencyLevel = EnchantmentHelper.getLevel(efficiencyEnchantment, stack);
+
+			if (efficiencyLevel > 0) {
+				efficiency += efficiencyLevel * efficiency * 0.3f;
+			}
+
 			if (efficiency > bestEfficiency) {
 				bestEfficiency = efficiency;
 				bestSlot = i;
 			}
 		}
-		inventory.setSelectedSlot(bestSlot);
+
+		if (bestSlot != currentSlot && bestSlot != -1) {
+			inventory.setSelectedSlot(bestSlot);
+		}
 	}
 }
