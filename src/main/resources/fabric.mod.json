@@ -8,7 +8,8 @@
 		"Maganoos"
 	],
 	"contact": {
-		"homepage": "https://magkari.eu",
+		"homepage": "https://modrinth.com/mod/tool-switcher",
+		"issues": "https://github.com/Maganoos/tool-switcher/issues",
 		"sources": "https://github.com/Maganoos/tool-switcher"
 	},
 	"license": "MIT",
@@ -23,7 +24,7 @@
 		"tool-switcher.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.14",
+		"fabricloader": ">=0.16",
 		"minecraft": ">=1.21.0",
 		"java": ">=21",
 		"fabric-api": "*"
