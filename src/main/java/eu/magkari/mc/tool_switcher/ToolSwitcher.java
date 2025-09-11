@@ -9,6 +9,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class ToolSwitcher implements ClientModInitializer {
     public static boolean toggled = true;
+	public static int previousSlot = -1;
 
     @Override
 	public void onInitializeClient() {

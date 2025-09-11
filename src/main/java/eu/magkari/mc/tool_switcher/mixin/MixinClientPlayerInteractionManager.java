@@ -1,5 +1,6 @@
 package eu.magkari.mc.tool_switcher.mixin;
 
+import eu.magkari.mc.tool_switcher.ToolSwitcher;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static eu.magkari.mc.tool_switcher.ToolSwitcher.toggled;
+import static eu.magkari.mc.tool_switcher.ToolSwitcher.previousSlot;
 
 @Mixin(ClientPlayerInteractionManager.class)
 public class MixinClientPlayerInteractionManager {
@@ -38,7 +40,7 @@ public class MixinClientPlayerInteractionManager {
 	);
 
 	@Inject(method = "attackBlock", at = @At("HEAD"))
-	private void onAttackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+	private void ToolSwitcher$onAttackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
 		if (!toggled) {
 			return;
 		}
@@ -54,7 +56,28 @@ public class MixinClientPlayerInteractionManager {
 				.filter(entry -> blockState.isIn(entry.getKey()))
 				.map(Map.Entry::getValue)
 				.findFirst()
-				.ifPresent(toolTag -> switchTool(toolTag, blockState, client, pos));
+				.ifPresent(toolTag -> switchTool(toolTag, blockState, client));
+	}
+
+	@Inject(method = "breakBlock", at = @At("TAIL"))
+	private void ToolSwitcher$onBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+		if (!toggled) return;
+
+		final MinecraftClient client = MinecraftClient.getInstance();
+		if (client.world == null || client.player == null) return;
+
+		final var hitResult = client.crosshairTarget;
+		if (hitResult == null || hitResult.getType() != net.minecraft.util.hit.HitResult.Type.BLOCK) return;
+
+		final var blockHitResult = (net.minecraft.util.hit.BlockHitResult) hitResult;
+		final BlockPos targetPos = blockHitResult.getBlockPos();
+		final BlockState targetState = client.world.getBlockState(targetPos);
+
+		TOOL_MAP.entrySet().stream()
+				.filter(entry -> targetState.isIn(entry.getKey()))
+				.map(Map.Entry::getValue)
+				.findFirst()
+				.ifPresent(toolTag -> switchTool(toolTag, targetState, client));
 	}
 
 	/**
@@ -63,10 +86,9 @@ public class MixinClientPlayerInteractionManager {
 	 * @param toolTag Target tool type tag
 	 * @param state   Block state being mined
 	 * @param client  Minecraft client instance
-	 * @param pos     Block position
 	 */
 	@Unique
-	private void switchTool(TagKey<Item> toolTag, BlockState state, MinecraftClient client, BlockPos pos) {
+	private void switchTool(TagKey<Item> toolTag, BlockState state, MinecraftClient client) {
 		if (client.player == null) {
 			throw new IllegalStateException("Cannot switch tools: MinecraftClient.player is null.");
 		}
@@ -119,6 +141,7 @@ public class MixinClientPlayerInteractionManager {
 		}
 
 		if (bestSlot != currentSlot && bestSlot != -1) {
+			previousSlot = currentSlot;
 			inventory.setSelectedSlot(bestSlot);
 		}
 	}
