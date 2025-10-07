@@ -16,7 +16,7 @@ public class ToolSwitcher implements ClientModInitializer {
         KeyBinding toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.tool-switcher.toggle",
                 GLFW.GLFW_KEY_PERIOD,
-                "key.categories.misc"
+                KeyBinding.Category.MISC
         ));
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (toggleKey.wasPressed()) {

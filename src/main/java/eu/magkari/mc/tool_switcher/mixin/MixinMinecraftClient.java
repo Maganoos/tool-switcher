@@ -10,9 +10,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static eu.magkari.mc.tool_switcher.ToolSwitcher.toggled;
-import static eu.magkari.mc.tool_switcher.ToolSwitcher.previousSlot;
-
 @Mixin(MinecraftClient.class)
 public class MixinMinecraftClient {
     @Unique
@@ -20,7 +17,7 @@ public class MixinMinecraftClient {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void ToolSwitcher$onClientTick(CallbackInfo ci) {
-        if (!toggled) return;
+        if (!ToolSwitcher.toggled) return;
 
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null) return;
@@ -37,9 +34,9 @@ public class MixinMinecraftClient {
 
     @Unique
     private void revertToPreviousSlot(ClientPlayerEntity player) {
-        if (previousSlot != -1) {
-            player.getInventory().setSelectedSlot(previousSlot);
-            previousSlot = -1;
+        if (ToolSwitcher.previousSlot != -1) {
+            player.getInventory().setSelectedSlot(ToolSwitcher.previousSlot);
+            ToolSwitcher.previousSlot = -1;
         }
     }
 }

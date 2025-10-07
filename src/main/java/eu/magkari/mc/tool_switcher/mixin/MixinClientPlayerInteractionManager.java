@@ -26,9 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Map;
 import java.util.Objects;
 
-import static eu.magkari.mc.tool_switcher.ToolSwitcher.toggled;
-import static eu.magkari.mc.tool_switcher.ToolSwitcher.previousSlot;
-
 @Mixin(ClientPlayerInteractionManager.class)
 public class MixinClientPlayerInteractionManager {
 	@Unique
@@ -41,7 +38,7 @@ public class MixinClientPlayerInteractionManager {
 
 	@Inject(method = "attackBlock", at = @At("HEAD"))
 	private void ToolSwitcher$onAttackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-		if (!toggled) {
+		if (!ToolSwitcher.toggled) {
 			return;
 		}
 
@@ -61,7 +58,7 @@ public class MixinClientPlayerInteractionManager {
 
 	@Inject(method = "breakBlock", at = @At("TAIL"))
 	private void ToolSwitcher$onBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-		if (!toggled) return;
+		if (!ToolSwitcher.toggled) return;
 
 		final MinecraftClient client = MinecraftClient.getInstance();
 		if (client.world == null || client.player == null) return;
@@ -141,7 +138,7 @@ public class MixinClientPlayerInteractionManager {
 		}
 
 		if (bestSlot != currentSlot && bestSlot != -1) {
-			previousSlot = currentSlot;
+			ToolSwitcher.previousSlot = currentSlot;
 			inventory.setSelectedSlot(bestSlot);
 		}
 	}
