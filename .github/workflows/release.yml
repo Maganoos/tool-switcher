@@ -34,8 +34,15 @@ jobs:
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH }}
           CHANGELOG: ${{ github.event.release.body }}
+
       - name: Upload GitHub release
         uses: AButler/upload-release-assets@v2.0
         with:
           files: 'build/libs/*.jar;!build/libs/*-sources.jar;!build/libs/*-dev.jar'
           repo-token: ${{ secrets.TOKEN_GITHUB }}
+
+      - name: Upload to CurseForge
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          curseforge-id: 7093147
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
