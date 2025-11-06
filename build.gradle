@@ -66,6 +66,8 @@ modrinth {
 	changelog = System.getenv("CHANGELOG")
 	dependencies {
 		required.project "fabric-api"
+        embedded.project "midnightlib"
+        optional.project "modmenu"
 	}
 	gameVersions = ["1.21.9", "1.21.10"]
 	syncBodyFrom = rootProject.file("README.md").text
