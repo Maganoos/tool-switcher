@@ -20,9 +20,6 @@
 			"eu.magkari.mc.tool_switcher.ToolSwitcher"
 		]
 	},
-	"mixins": [
-		"tool-switcher.mixins.json"
-	],
 	"depends": {
 		"fabricloader": ">=0.16",
 		"minecraft": ">=1.21.9",
