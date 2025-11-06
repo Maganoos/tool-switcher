@@ -44,5 +44,5 @@ jobs:
       - name: Upload to CurseForge
         uses: Kir-Antipov/mc-publish@v3.3
         with:
-          curseforge-id: 7093147
+          curseforge-id: 1362045
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
