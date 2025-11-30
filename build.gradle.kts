@@ -91,9 +91,8 @@ tasks {
 // Publishes builds to Modrinth and Curseforge with changelog from the CHANGELOG.md file
 publishMods {
     file = tasks.remapJar.map { it.archiveFile.get() }
-    additionalFiles.from(tasks.remapSourcesJar.map { it.archiveFile.get() })
     displayName = "${property("mod.name")} v${property("mod.version")} for ${property("mod.mc_title")}"
-    version = property("mod.version") as String
+    version = version
     changelog = rootProject.file("CHANGELOG.md").readText()
     type = STABLE
     modLoaders.add("fabric")
@@ -105,20 +104,14 @@ publishMods {
         projectId = property("publish.modrinth") as String
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         minecraftVersions.addAll(property("mod.mc_targets").toString().split(' '))
-        requires {
-            slug = "fabric-api"
-            slug = "midnightlib"
-        }
+        requires("fabric-api", "midnightlib")
     }
 
     curseforge {
         projectId = property("publish.curseforge") as String
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         minecraftVersions.addAll(property("mod.mc_targets").toString().split(' '))
-        requires {
-            slug = "fabric-api"
-            slug = "midnightlib"
-        }
+        requires("fabric-api", "midnightlib")
     }
 }
 /*
