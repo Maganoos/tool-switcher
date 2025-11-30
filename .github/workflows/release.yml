@@ -11,15 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/loom-cache
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-
       - uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
@@ -30,19 +21,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build and publish with Gradle
-        run: ./gradlew build modrinth
+        run: ./gradlew build publishMods
         env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH }}
-          CHANGELOG: ${{ github.event.release.body }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
 
       - name: Upload GitHub release
         uses: AButler/upload-release-assets@v2.0
         with:
-          files: 'build/libs/*.jar;!build/libs/*-sources.jar;!build/libs/*-dev.jar'
+          files: 'versions/*/build/libs/*.jar;!versions/*/build/libs/*-sources.jar;!versions/*/build/libs/*-dev.jar'
           repo-token: ${{ secrets.TOKEN_GITHUB }}
-
-      - name: Upload to CurseForge
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          curseforge-id: 1362045
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}

@@ -3,7 +3,7 @@
 Tool Switcher is a simple utility mod that enables you to automatically switch tools depending on what block you are trying to break.
 ### Features
 - Automatically selects the optimal tool for mining, taking into account factors such as efficiency.
-- Disables itself while player is sneaking, if enabled.
+- Disables itself while you are sneaking, if enabled.
 - Optionally prevents switching if the current tool has Silk Touch or Fortune.
 - Returns to the previously selected hotbar slot after mining if enabled.
 - Fully customizable list of disabled blocks and tools.
@@ -22,7 +22,7 @@ Tool Switcher is a simple utility mod that enables you to automatically switch t
 
 ### Required/Recommended mods
 - [Fabric API](https://modrinth.com/mod/fabric-api) (Required)
-- [MidnightLib](https://modrinth.com/mod/midnightlib) (Embedded)
+- [MidnightLib](https://modrinth.com/mod/midnightlib) (Required)
 - [Mod Menu](https://modrinth.com/mod/modmenu) (Recommended)
 
 ### Issues/Feature Requests

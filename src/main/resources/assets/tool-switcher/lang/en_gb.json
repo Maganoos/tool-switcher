@@ -1,0 +1,19 @@
+{
+  "key.tool-switcher.toggle": "Toggle Tool Switcher",
+  "tool-switcher.msg.state": "Tool Switcher: ",
+  "tool-switcher.midnightconfig.title": "Tool Switcher",
+  "tool-switcher.midnightconfig.enabled": "Mod Enabled",
+  "tool-switcher.midnightconfig.enabled.tooltip": "Enable or disable the mod. Can be toggled with a key binding",
+  "tool-switcher.midnightconfig.sneaking": "Turn Off when Sneaking",
+  "tool-switcher.midnightconfig.sneaking.tooltip": "Whether Tool Switcher remains active while sneaking",
+  "tool-switcher.midnightconfig.showMessage": "Show Message",
+  "tool-switcher.midnightconfig.showMessage.tooltip": "Whether to show a message on the screen when the key binding is pressed",
+  "tool-switcher.midnightconfig.goBack": "Go Back to Previous Slot",
+  "tool-switcher.midnightconfig.goBack.tooltip": "Whether to switch back to the slot you were using before mining",
+  "tool-switcher.midnightconfig.respectSilkFortune": "Respect Silk Touch/Fortune",
+  "tool-switcher.midnightconfig.respectSilkFortune.tooltip": "Whether to avoid switching tools if you are holding a Silk Touch or Fortune tool",
+  "tool-switcher.midnightconfig.disabledTools": "Disabled Tools",
+  "tool-switcher.midnightconfig.disabledTools.tooltip": "Tools that will not be switched to",
+  "tool-switcher.midnightconfig.disabledBlocks": "Disabled Blocks",
+  "tool-switcher.midnightconfig.disabledBlocks.tooltip": "Blocks that will not trigger Tool Switcher"
+}

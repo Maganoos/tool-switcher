@@ -1,29 +1,29 @@
 {
-	"schemaVersion": 1,
-	"id": "tool-switcher",
-	"version": "${version}",
-	"name": "Tool Switcher",
-	"description": "Automatically switches to the correct tool when breaking blocks.",
-	"authors": [
-		"Maganoos"
-	],
-	"contact": {
-		"homepage": "https://modrinth.com/mod/tool-switcher",
-		"issues": "https://github.com/Maganoos/tool-switcher/issues",
-		"sources": "https://github.com/Maganoos/tool-switcher"
-	},
-	"license": "MIT",
-	"icon": "assets/tool-switcher/icon.png",
-	"environment": "client",
-	"entrypoints": {
-		"client": [
-			"eu.magkari.mc.tool_switcher.ToolSwitcher"
-		]
-	},
-	"depends": {
-		"fabricloader": ">=0.16",
-		"minecraft": ">=1.21.9",
-		"java": ">=21",
-		"fabric-api": "*"
-	}
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "Automatically switches to the correct tool when breaking blocks.",
+  "authors": [
+    "Maganoos"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/tool-switcher",
+    "issues": "https://github.com/Maganoos/tool-switcher/issues",
+    "sources": "https://github.com/Maganoos/tool-switcher"
+  },
+  "license": "MIT",
+  "icon": "assets/tool-switcher/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "eu.magkari.mc.tool_switcher.ToolSwitcher"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18",
+    "minecraft": "${minecraft}",
+    "fabric-api": "*",
+    "midnightlib": "*"
+  }
 }
