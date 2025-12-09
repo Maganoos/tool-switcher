@@ -36,12 +36,9 @@ dependencies {
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
 
-    var mnlib = "eu.midnightdust:midnightlib:${property("deps.midnight_lib")}";
-
-    modImplementation(mnlib) {
+    modImplementation("eu.midnightdust:midnightlib:${property("deps.midnight_lib")}") {
         isTransitive = false
     }
-    include(mnlib)
 }
 
 loom {
@@ -114,14 +111,14 @@ publishMods {
         projectId = property("publish.modrinth") as String
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         minecraftVersions.addAll(property("mod.mc_targets").toString().split(' '))
-        requires("fabric-api")
+        requires("fabric-api", "midnightlib")
     }
 
     curseforge {
         projectId = property("publish.curseforge") as String
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         minecraftVersions.addAll(property("mod.mc_targets").toString().split(' '))
-        requires("fabric-api")
+        requires("fabric-api", "midnightlib")
     }
 }
 /*
