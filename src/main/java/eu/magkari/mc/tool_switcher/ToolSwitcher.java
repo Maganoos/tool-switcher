@@ -95,14 +95,12 @@ public class ToolSwitcher implements ClientModInitializer {
 
             if (TSConfig.stateIsDisabled(blockState)) return InteractionResult.PASS;
 
-            findAndSwitchTool(blockState, client);
+            findAndSwitchTool(blockState, client, true);
             return InteractionResult.PASS;
         });
 
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, entity) -> {
             if (!TSConfig.enabled || (!TSConfig.sneaking && player.isShiftKeyDown())) return;
-            if (TSConfig.goBack && !Minecraft.getInstance().options.keyAttack.isDown())
-                setSelectedSlot(player.getInventory(), previousSlot);
 
             final Minecraft client = Minecraft.getInstance();
             final HitResult hitResult = client.hitResult;
@@ -113,7 +111,7 @@ public class ToolSwitcher implements ClientModInitializer {
 
             if (TSConfig.stateIsDisabled(targetState)) return;
 
-            findAndSwitchTool(targetState, client);
+            findAndSwitchTool(targetState, client, false);
         });
     }
 
@@ -123,20 +121,22 @@ public class ToolSwitcher implements ClientModInitializer {
      * @param state  The block state being interacted with
      * @param client The Minecraft client instance
      */
-    private static void findAndSwitchTool(final BlockState state, final Minecraft client) {
+    private static void findAndSwitchTool(final BlockState state, final Minecraft client, final boolean shouldUpdatePrevious) {
         TOOL_MAP.entrySet().stream()
                 .filter(entry -> state.is(entry.getKey()))
                 .map(Map.Entry::getValue)
                 .findFirst()
-                .ifPresent(toolTag -> switchTool(toolTag, state, client));
+                .ifPresent(toolTag -> switchTool(toolTag, state, client, shouldUpdatePrevious));
     }
 
     private static void setSelectedSlot(Inventory inventory, final int slot) {
-        //? if >=1.21.5 {
-        inventory.setSelectedSlot(slot);
-         //?} else {
-        /*inventory.selected = slot;
-        *///?}
+        if (Inventory.isHotbarSlot(slot)) {
+            //? if >=1.21.5 {
+            inventory.setSelectedSlot(slot);
+            //?} else {
+            /*inventory.selected = slot;
+             *///?}
+        }
     }
 
 
@@ -147,7 +147,7 @@ public class ToolSwitcher implements ClientModInitializer {
      * @param state   Block state being mined
      * @param client  Minecraft client instance
      */
-    public static void switchTool(final TagKey<Item> toolTag, final BlockState state, final Minecraft client) {
+    public static void switchTool(final TagKey<Item> toolTag, final BlockState state, final Minecraft client, final boolean shouldUpdatePrevious) {
         if ((client.gameMode != null && client.gameMode.getPlayerMode() != GameType.SURVIVAL)
                 || client.getConnection() == null
                 || client.player == null) {
@@ -205,7 +205,7 @@ public class ToolSwitcher implements ClientModInitializer {
         }
 
         if (bestSlot != currentSlot && bestSlot != -1) {
-            previousSlot = currentSlot;
+            if (shouldUpdatePrevious) previousSlot = currentSlot;
             setSelectedSlot(inventory, bestSlot);
         }
     }
