@@ -22,7 +22,7 @@ Tool Switcher is a simple utility mod that enables you to automatically switch t
 
 ### Required/Recommended mods
 - [Fabric API](https://modrinth.com/mod/fabric-api) (Required)
-- [MidnightLib](https://modrinth.com/mod/midnightlib) (Required)
+- [MidnightLib](https://modrinth.com/mod/midnightlib) (Embedded)
 - [Mod Menu](https://modrinth.com/mod/modmenu) (Recommended)
 
 ### Issues/Feature Requests
