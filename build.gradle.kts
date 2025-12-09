@@ -36,9 +36,12 @@ dependencies {
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
 
-    modImplementation("eu.midnightdust:midnightlib:${property("deps.midnight_lib")}") {
+    var mnlib = "eu.midnightdust:midnightlib:${property("deps.midnight_lib")}";
+
+    modImplementation(mnlib) {
         isTransitive = false
     }
+    include(mnlib)
 }
 
 loom {
@@ -52,6 +55,13 @@ loom {
         ideConfigGenerated(true)
         vmArgs("-Dmixin.debug.export=true") // Exports transformed classes for debugging
         runDir = "../../run" // Shares the run directory between versions
+    }
+}
+
+stonecutter {
+    replacements.string {
+        direction = eval(current.version, ">=1.21.11")
+        replace("ResourceLocation", "Identifier")
     }
 }
 

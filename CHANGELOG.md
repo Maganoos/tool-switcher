@@ -1,4 +1,4 @@
-# 3.0.0!
-Added stonecutter for multiversion development, and refactored most of the (tiny) codebase to reflect that decision, hence the big 3.0.0 :)
+# 3.0.1
+Update to 1.21.11
 
-I will now continue releasing tool switcher for multiple versions!
+Minor refactors

@@ -18,7 +18,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameType;
@@ -28,9 +27,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.lwjgl.glfw.GLFW;
 //? if >=1.21 {
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
-import java.util.Set;
+//?}
+//? if >=1.20.5 {
+import net.minecraft.tags.EnchantmentTags;
 //?}
 
 import java.util.Map;
@@ -41,8 +41,8 @@ public class ToolSwitcher implements ClientModInitializer {
 
     public static final Map<TagKey<Block>, TagKey<Item>> TOOL_MAP = Map.of(
             //? if >=1.21.5 {
-            /*BlockTags.SWORD_INSTANTLY_MINES, ItemTags.SWORDS,
-            *///?}
+            BlockTags.SWORD_INSTANTLY_MINES, ItemTags.SWORDS,
+             //?}
             BlockTags.MINEABLE_WITH_PICKAXE, ItemTags.PICKAXES,
             BlockTags.MINEABLE_WITH_AXE, ItemTags.AXES,
             BlockTags.MINEABLE_WITH_SHOVEL, ItemTags.SHOVELS,
@@ -58,10 +58,10 @@ public class ToolSwitcher implements ClientModInitializer {
                 "key." + MOD_ID + ".toggle",
                 GLFW.GLFW_KEY_PERIOD,
                 //? if >= 1.21.9 {
-                /*KeyMapping.Category.MISC
-                *///?} else {
-                "key.category.minecraft.misc"
-                //?}
+                KeyMapping.Category.MISC
+                 //?} else {
+                /*"key.category.minecraft.misc"
+                *///?}
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -69,14 +69,12 @@ public class ToolSwitcher implements ClientModInitializer {
                 TSConfig.enabled = !TSConfig.enabled;
                 MidnightConfig.write(MOD_ID);
 
-                if (TSConfig.showMessage) {
-                    client.getChatListener().handleSystemMessage(
-                            Component.translatable(MOD_ID + ".msg.state").withStyle(ChatFormatting.GOLD)
-                                    .append(Component.translatable(TSConfig.enabled ? "options.on" : "options.off")
-                                            .withStyle(TSConfig.enabled ? ChatFormatting.GREEN : ChatFormatting.RED)),
-                            true
-                    );
-                }
+                if (TSConfig.showMessage) client.getChatListener().handleSystemMessage(
+                        Component.translatable(MOD_ID + ".msg.state").withStyle(ChatFormatting.GOLD)
+                                .append(Component.translatable(TSConfig.enabled ? "options.on" : "options.off")
+                                        .withStyle(TSConfig.enabled ? ChatFormatting.GREEN : ChatFormatting.RED)),
+                        true
+                );
             }
 
             if (!TSConfig.enabled || client.player == null || !TSConfig.goBack) return;
@@ -97,17 +95,14 @@ public class ToolSwitcher implements ClientModInitializer {
 
             if (TSConfig.stateIsDisabled(blockState)) return InteractionResult.PASS;
 
-            TOOL_MAP.entrySet().stream()
-                    .filter(entry -> blockState.is(entry.getKey()))
-                    .map(Map.Entry::getValue)
-                    .findFirst()
-                    .ifPresent(toolTag -> switchTool(toolTag, blockState, client));
+            findAndSwitchTool(blockState, client);
             return InteractionResult.PASS;
         });
 
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, entity) -> {
             if (!TSConfig.enabled || (!TSConfig.sneaking && player.isShiftKeyDown())) return;
-            if (TSConfig.goBack && !Minecraft.getInstance().options.keyAttack.isDown()) setSelectedSlot(player.getInventory(), previousSlot);
+            if (TSConfig.goBack && !Minecraft.getInstance().options.keyAttack.isDown())
+                setSelectedSlot(player.getInventory(), previousSlot);
 
             final Minecraft client = Minecraft.getInstance();
             final HitResult hitResult = client.hitResult;
@@ -118,7 +113,7 @@ public class ToolSwitcher implements ClientModInitializer {
 
             if (TSConfig.stateIsDisabled(targetState)) return;
 
-            findSwitchTool(targetState, client);
+            findAndSwitchTool(targetState, client);
         });
     }
 
@@ -128,7 +123,7 @@ public class ToolSwitcher implements ClientModInitializer {
      * @param state  The block state being interacted with
      * @param client The Minecraft client instance
      */
-    private static void findSwitchTool(final BlockState state, final Minecraft client) {
+    private static void findAndSwitchTool(final BlockState state, final Minecraft client) {
         TOOL_MAP.entrySet().stream()
                 .filter(entry -> state.is(entry.getKey()))
                 .map(Map.Entry::getValue)
@@ -136,12 +131,12 @@ public class ToolSwitcher implements ClientModInitializer {
                 .ifPresent(toolTag -> switchTool(toolTag, state, client));
     }
 
-    private static void setSelectedSlot(Inventory inventory, int slot) {
+    private static void setSelectedSlot(Inventory inventory, final int slot) {
         //? if >=1.21.5 {
-        /*inventory.setSelectedSlot(slot);
-         *///?} else {
-        inventory.selected = slot;
-        //?}
+        inventory.setSelectedSlot(slot);
+         //?} else {
+        /*inventory.selected = slot;
+        *///?}
     }
 
 
@@ -161,41 +156,35 @@ public class ToolSwitcher implements ClientModInitializer {
 
         final var inventory = client.player.getInventory();
         //? if >=1.21.5 {
-        /*final int currentSlot = inventory.getSelectedSlot();
-        *///?} else {
-        final int currentSlot = inventory.selected;
-        //?}
+        final int currentSlot = inventory.getSelectedSlot();
+         //?} else {
+        /*final int currentSlot = inventory.selected;
+        *///?}
         final var currentStack = inventory.getItem(currentSlot);
 
         float bestEfficiency = -1f;
         int bestSlot = -1;
         //? if >=1.21 {
-        final var enchantmentRegistry = client.getConnection().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
-
-        final Holder<Enchantment> efficiencyEnchantment = enchantmentRegistry.getOrThrow(Enchantments.EFFICIENCY);
-        final Holder<Enchantment> silkEnchantment = enchantmentRegistry.getOrThrow(Enchantments.SILK_TOUCH);
-        final Holder<Enchantment> fortuneEnchantment = enchantmentRegistry.getOrThrow(Enchantments.FORTUNE);
+        final var efficiencyEnchantment = client.getConnection().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.EFFICIENCY);
         //?} else {
-        /*final Enchantment efficiencyEnchantment = Enchantments.BLOCK_EFFICIENCY;
-        final Enchantment fortuneEnchantment = Enchantments.BLOCK_FORTUNE;
-        *///?}
+        /*final var efficiencyEnchantment = Enchantments.BLOCK_EFFICIENCY;
+         *///?}
 
         if (currentStack.is(toolTag)) {
+            if (TSConfig.respectSilkFortune) {
+                //? if >=1.20.5 {
+                if (EnchantmentHelper.hasTag(currentStack, EnchantmentTags.MINING_EXCLUSIVE)) return;
+                //?} else {
+                /*if (EnchantmentHelper.hasSilkTouch(currentStack) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, currentStack) > 0) return;
+                 *///?}
+            }
             bestEfficiency = currentStack.getDestroySpeed(state);
-            final int currentEfficiencyLevel = EnchantmentHelper.getItemEnchantmentLevel(efficiencyEnchantment, currentStack);
+            final int efficiencyLevel = EnchantmentHelper.getItemEnchantmentLevel(efficiencyEnchantment, currentStack);
 
-            if (currentEfficiencyLevel > 0) {
-                bestEfficiency += currentEfficiencyLevel * bestEfficiency * 0.3f;
+            if (efficiencyLevel > 0) {
+                bestEfficiency += efficiencyLevel * bestEfficiency * 0.3f;
             }
             bestSlot = currentSlot;
-            if (TSConfig.respectSilkFortune) {
-                //? if >=1.21.1 {
-                final Set<Holder<Enchantment>> enchants = currentStack.getEnchantments().keySet();
-                if (enchants.contains(silkEnchantment) || enchants.contains(fortuneEnchantment)) return;
-                //?} else {
-                /*if (EnchantmentHelper.hasSilkTouch(currentStack) || EnchantmentHelper.getItemEnchantmentLevel(fortuneEnchantment, currentStack) > 0) return;
-                *///?}
-            }
         }
 
         for (int i = 0; i < 9; i++) {
